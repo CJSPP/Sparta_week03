@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 public class Memo extends TimeStamped {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO) //auto_increment 전략
     private Long id;
 
     @Column(nullable = false)

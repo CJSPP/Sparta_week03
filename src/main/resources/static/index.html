@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>201718042 박진성</title>
+    <title>Timeline Service</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
@@ -213,7 +213,7 @@
                 alert('내용을 입력해주세요');
                 return false;
             }
-            if (contents.trim().length > 140) { //trim메소드는 문자열의 앞뒤 공백 제거
+            if (contents.trim().length > 140) {
                 alert('공백 포함 140자 이하로 입력해주세요');
                 return false;
             }
@@ -226,9 +226,9 @@
             let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let charactersLength = characters.length;
             for (let i = 0; i < length; i++) {
-                let number = Math.random() * charactersLength; //random(): 난수 발생
-                let index = Math.floor(number); //floor는 number(파라미터) 값보다 작거나 같은 값을 반환
-                result += characters.charAt(index); //charAt은 문자열중 하나를 char 타입으로 반환(index번째의 문자 반환)
+                let number = Math.random() * charactersLength;
+                let index = Math.floor(number);
+                result += characters.charAt(index);
             }
             return result;
         }
@@ -250,15 +250,6 @@
             $(`#${id}-edit`).hide();
         }
 
-        function hideEdits(id) {
-            $(`#${id}-editarea`).hide();
-            $(`#${id}-submit`).hide();
-            $(`#${id}-delete`).hide();
-
-            $(`#${id}-contents`).show();
-            $(`#${id}-edit`).show();
-        }
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // 여기서부터 코드를 작성해주시면 됩니다.
 
@@ -269,19 +260,19 @@
 
         // 메모를 불러와서 보여줍니다.
         function getMessages() {
-
-            $('#cards-box').empty();  // 1. 기존 메모 내용을 지웁니다.
-
-            $.ajax({ // 2. 메모 목록을 불러와서 HTML로 붙입니다.
+            // 1. 기존 메모 내용을 지웁니다.
+            $('#cards-box').empty();
+            // 2. 메모 목록을 불러와서 HTML로 붙입니다.
+            $.ajax({
                 type: 'GET',
-                url: 'api/memos',
-                success: function (response) { //성공하면 자바스크립트에서 response안에 메모목록 전체를 자동으로 저장
+                url: '/api/memos',
+                success: function (response) {
                     for (let i = 0; i < response.length; i++) {
-                        let memo = response[i];
-                        let id = memo.id;
-                        let username = memo.username;
-                        let contents = memo.contents;
-                        let modifiedAt = memo.modifiedAt;
+                        let message = response[i];
+                        let id = message['id'];
+                        let username = message['username'];
+                        let contents = message['contents'];
+                        let modifiedAt = message['modifiedAt'];
                         addHTML(id, username, contents, modifiedAt);
                     }
                 }
@@ -292,56 +283,59 @@
         function addHTML(id, username, contents, modifiedAt) {
             // 1. HTML 태그를 만듭니다.
             let tempHtml = `<div class="card">
-        <!-- date/username 영역 -->
-        <div class="metadata">
-            <div class="date">
-                ${modifiedAt}
-            </div>
-            <div id="${id}-username" class="username">
-                ${username}
-            </div>
-        </div>
-        <!-- contents 조회/수정 영역-->
-        <div class="contents">
-            <div id="${id}-contents" class="text">
-                ${contents}
-            </div>
-            <div id="${id}-editarea" class="edit">
-                <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
-            </div>
-        </div>
-        <!-- 버튼 영역-->
-        <div class="footer">
-            <img id="${id}-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
-            <img id="${id}-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('${id}')">
-            <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
-        </div>
-    </div>`;
+                <!-- date/username 영역 -->
+                <div class="metadata">
+                    <div class="date">
+                        ${modifiedAt}
+                    </div>
+                    <div id="${id}-username" class="username">
+                        ${username}
+                    </div>
+                </div>
+                <!-- contents 조회/수정 영역-->
+                <div class="contents">
+                    <div id="${id}-contents" class="text">
+                        ${contents}
+                    </div>
+                    <div id="${id}-editarea" class="edit">
+                        <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
+                    </div>
+                </div>
+                <!-- 버튼 영역-->
+                <div class="footer">
+                    <img id="${id}-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
+                    <img id="${id}-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('${id}')">
+                    <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
+                </div>
+            </div>`;
             // 2. #cards-box 에 HTML을 붙인다.
             $('#cards-box').append(tempHtml);
         }
 
         // 메모를 생성합니다.
         function writePost() {
-            let contents = $('#contents').val(); // 1. 작성한 메모를 불러옵니다.
+            // 1. 작성한 메모를 불러옵니다.
+            let contents = $('#contents').val();
 
-            if (isValidContents(contents) == false) { // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
+            // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
+            if (isValidContents(contents) == false) {
                 return;
             }
+            // 3. genRandomName 함수를 통해 익명의 username을 만듭니다.
+            let username = genRandomName(10);
 
-            let username = genRandomName(10);  // 3. genRandomName 함수를 통해 익명의 username을 만듭니다.
+            // 4. 전달할 data JSON으로 만듭니다.
+            let data = {'username': username, 'contents': contents};
 
-            let data = {'username': username, 'contents': contents};   // 4. 전달할 data JSON으로 만듭니다.
-
-            $.ajax({ // 5. POST /api/memos 에 data를 전달합니다.(ARC를 코드로 구현, jQuery 방식)
-                type: "POST", //POST 방식
-                url: "/api/memos", //url
-                contentType: "application/json", // JSON 형식으로 전달함을 알리기
-                data: JSON.stringify(data), //body영역에 json형태의 데이터 넣기
-                // JSON.stringify(data) ->JavaScript 값이나 객체를 JSON 문자열로 변환
-                success: function () { //서버가 성공적으로 응답할 때 메소드 안의 내용을 실행
+            // 5. POST /api/memos 에 data를 전달합니다.
+            $.ajax({
+                type: "POST",
+                url: "/api/memos",
+                contentType: "application/json",
+                data: JSON.stringify(data),
+                success: function (response) {
                     alert('메시지가 성공적으로 작성되었습니다.');
-                    window.location.reload(); //새로고침
+                    window.location.reload();
                 }
             });
         }
@@ -350,24 +344,23 @@
         function submitEdit(id) {
             // 1. 작성 대상 메모의 username과 contents 를 확인합니다.
             let username = $(`#${id}-username`).text().trim();
-            //username처럼 div안에 읽기 모드처럼 텍스트 박혀있는 데이터를 가져오려면 =
-            // 수정버튼을 누르면 그 전 부분이 숨겨지는 구조이므로 username은 .text()로 가져온다
             let contents = $(`#${id}-textarea`).val().trim();
 
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
             if (isValidContents(contents) == false) {
-                return; //return; 는 끝내기
+                return;
             }
+
             // 3. 전달할 data JSON으로 만듭니다.
             let data = {'username': username, 'contents': contents};
 
             // 4. PUT /api/memos/{id} 에 data를 전달합니다.
-            $.ajax({ //jQuery, 자바스크립트로 서버에 데이터를 비동기 방식으로 요청
+            $.ajax({
                 type: "PUT",
                 url: `/api/memos/${id}`,
                 contentType: "application/json",
                 data: JSON.stringify(data),
-                success: function () {
+                success: function (response) {
                     alert('메시지 변경에 성공하였습니다.');
                     window.location.reload();
                 }
@@ -380,8 +373,8 @@
             $.ajax({
                 type: "DELETE",
                 url: `/api/memos/${id}`,
-                success: function () {
-                    alert('삭제가 완료되었습니다.');
+                success: function (response) {
+                    alert('메시지 삭제에 성공하였습니다.');
                     window.location.reload();
                 }
             })
@@ -411,6 +404,33 @@
         <img src="images/send.png" alt="" onclick="writePost()">
     </div>
     <div id="cards-box" class="area-read">
+        <div class="card">
+            <!-- date/username 영역 -->
+            <div class="metadata">
+                <div class="date">
+                    October 10, 2020
+                </div>
+                <div class="username">
+                    anonymous
+                </div>
+            </div>
+            <!-- contents 조회/수정 영역-->
+            <div class="contents">
+                <div id="1-contents" class="text">
+                    dsafnkalfklewakflekelafkleajfkleafkldsankflenwaklfnekwlafneklwanfkelawnfkelanfkleanfklew
+                </div>
+                <div id="1-editarea" class="edit">
+                    <textarea id="1-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
+                </div>
+            </div>
+            <!-- 버튼 영역-->
+            <div class="footer">
+                <img id="1-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('1')">
+                <img id="1-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('1')">
+                <img id="1-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('1')">
+            </div>
+        </div>
+
     </div>
 </div>
 </body>

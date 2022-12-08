@@ -8,6 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemoRequestDto {
-    private final String username;
-    private final String contents;
+    private String username;
+    private String contents;
 }
