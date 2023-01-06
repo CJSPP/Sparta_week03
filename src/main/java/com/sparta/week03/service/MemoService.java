@@ -15,7 +15,7 @@ public class MemoService {
     private final MemoRepository memoRepository;
 
     @Transactional //DB에 반영되야 한다고 알려주는 어노테이션
-    public Long update(Long id, @RequestBody MemoRequestDto requestDto) {
+    public Long update(Long id, MemoRequestDto requestDto) {
         Memo memo = memoRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("아이디가 존재하지않습니다!")
         );

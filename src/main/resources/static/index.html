@@ -269,10 +269,10 @@
                 success: function (response) {
                     for (let i = 0; i < response.length; i++) {
                         let message = response[i];
-                        let id = message['id'];
-                        let username = message['username'];
-                        let contents = message['contents'];
-                        let modifiedAt = message['modifiedAt'];
+                        let id = message.id;
+                        let username = message.username;
+                        let contents = message.contents;
+                        let modifiedAt = message.modifiedAt;
                         addHTML(id, username, contents, modifiedAt);
                     }
                 }

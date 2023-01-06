@@ -28,7 +28,7 @@ public class MemoController {
     public List<Memo> getMemo() {
         LocalDateTime Days = LocalDateTime.now();
         LocalDateTime minusDays = LocalDateTime.now().minusDays(1);
-        return memoRepository.findAllByModifiedAtBetweenOrderByModifiedAtDesc(Days, minusDays);
+        return memoRepository.findAllByModifiedAtBetweenOrderByModifiedAtDesc(minusDays, Days);
     }
 
     @PutMapping("/api/memos/{id}")
@@ -40,7 +40,6 @@ public class MemoController {
 
     @DeleteMapping("/api/memos/{id}")
     public Long deleteMemo(@PathVariable Long id) {
-
         memoRepository.deleteById(id);
         return id;
     }
